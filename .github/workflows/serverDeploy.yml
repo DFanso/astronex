@@ -1,4 +1,4 @@
-name: CI/CD for Server
+name: CI/CD for NestJS App
 
 on:
   push:
@@ -48,15 +48,16 @@ jobs:
           echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
 
       - name: Push Docker image to Docker Hub
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/astronex-server:latest
+        run: docker push $DOCKER_USERNAME/astronex-server:latest
 
       - name: Deploy to Render
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
           echo "Deploying to Render"
-          # Install Render CLI and login
+          # Install Render CLI
           npm install -g render-cli
+          # Login to Render
           echo $RENDER_API_KEY | render login --api-key-stdin
           # Trigger Render deployment
-          render deploy --service srv-cpbht8vsc6pc73a9i1e0 --docker-image ${{ secrets.DOCKER_USERNAME }}/astronex-server:latest
+          render services update srv-cpbht8vsc6pc73a9i1e0 --image $DOCKER_USERNAME/astronex-server:latest
