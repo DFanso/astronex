@@ -26,16 +26,19 @@ jobs:
           node-version: '20' # Specify the Node.js version you are using
 
       - name: Install dependencies
-        working-directory: server
-        run: yarn install
+        run: |
+            cd server
+            yarn install
 
       - name: Run tests
-        working-directory: server
-        run: yarn test
+        run: |
+            cd server
+            yarn test
 
       - name: Build Docker image
         working-directory: server
         run: |
+          cd server
           echo "Building Docker image"
           docker build \
           --build-arg YOUR_BUILD_ARG_NAME=${{ secrets.YOUR_BUILD_ARG_SECRET }} \
