@@ -21,18 +21,22 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: '20' # Specify the Node.js version you are using
 
       - name: Install dependencies
+        working-directory: server
         run: yarn install
 
       - name: Run tests
+        working-directory: server
         run: yarn test
 
       - name: Build Docker image
+        working-directory: server
         run: |
+          echo "Building Docker image"
           docker build \
           --build-arg YOUR_BUILD_ARG_NAME=${{ secrets.YOUR_BUILD_ARG_SECRET }} \
           -t astronex-server .
@@ -51,9 +55,9 @@ jobs:
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
-          # Install Render CLI
+          echo "Deploying to Render"
+          # Install Render CLI and login
           npm install -g render-cli
-          # Login to Render
           echo $RENDER_API_KEY | render login --api-key-stdin
           # Trigger Render deployment
           render deploy --service srv-cpbht8vsc6pc73a9i1e0 --docker-image astronex-server
