@@ -26,23 +26,19 @@ jobs:
           node-version: '20' # Specify the Node.js version you are using
 
       - name: Install dependencies
-        run: |
-            cd server
-            yarn install
+        working-directory: server
+        run: yarn install
 
       - name: Run tests
-        run: |
-            cd server
-            yarn test
+        working-directory: server
+        run: yarn test
 
       - name: Build Docker image
-        working-directory: server
         run: |
-          cd server
           echo "Building Docker image"
           docker build \
           --build-arg YOUR_BUILD_ARG_NAME=${{ secrets.YOUR_BUILD_ARG_SECRET }} \
-          -t astronex-server .
+          -t astronex-server ./server
 
       - name: Log in to Docker Hub
         env:
