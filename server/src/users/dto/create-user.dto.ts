@@ -1,12 +1,14 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsEnum,
   IsOptional,
   IsString,
-  IsArray,
   IsDateString,
+  ValidateNested,
 } from 'class-validator';
 import { UserStatus, UserType, FoundFrom } from 'src/Types/user.types';
+import { LocationDto } from './location.dto';
 
 export class CreateUserDto {
   @ApiProperty({ description: 'First name of the user', example: 'John' })
@@ -31,10 +33,6 @@ export class CreateUserDto {
   @IsString()
   email: string;
 
-  @ApiProperty({ description: 'Password of the user', example: 'password123' })
-  @IsString()
-  password: string;
-
   @ApiPropertyOptional({
     enum: UserStatus,
     description: 'Status of the user',
@@ -53,14 +51,10 @@ export class CreateUserDto {
   @IsOptional()
   type?: UserType;
 
-  @ApiPropertyOptional({
-    type: [String],
-    description: 'Location of the user',
-    example: ['Country', 'City'],
-  })
-  @IsArray()
-  @IsOptional()
-  location?: [string, string];
+  @ApiProperty({ type: LocationDto })
+  @ValidateNested()
+  @Type(() => LocationDto)
+  location: LocationDto;
 
   @ApiPropertyOptional({
     description: 'Birthday of the user',

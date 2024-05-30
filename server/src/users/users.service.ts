@@ -19,16 +19,7 @@ export class UsersService {
   }
 
   async findOne(filter: any): Promise<UserDocument | null> {
-    return this.userModel
-      .findOne(filter)
-      .populate({
-        path: 'services',
-        populate: {
-          path: 'category',
-          model: 'Category',
-        },
-      })
-      .exec();
+    return this.userModel.findOne(filter).exec();
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {

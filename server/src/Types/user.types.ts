@@ -24,12 +24,6 @@ export interface JwtPayload {
   email: string;
 }
 
-export enum UserType {
-  Admin = 'ADMIN',
-  Member = 'MEMBER',
-  Institute = 'INSTITUTE',
-}
-
 export enum UserStatus {
   Verified = 'VERIFIED',
   Unverified = 'UNVERIFIED',
@@ -39,13 +33,14 @@ export enum UserStatus {
 export enum UserStatus {
   UNVERIFIED = 'UNVERIFIED',
   VERIFIED = 'VERIFIED',
-  FROM = 'FROM',
-  SSO = 'SSO',
+  INITIATE = 'INITIATE',
+  GOOGLE_AUTH = 'GOOGLE_AUTH',
 }
 
 export enum UserType {
   MEMBER = 'MEMBER',
   ADMIN = 'ADMIN',
+  INSTITUTE = 'INSTITUTE',
 }
 
 export enum FoundFrom {
