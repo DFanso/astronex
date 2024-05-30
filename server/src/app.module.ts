@@ -7,6 +7,7 @@ import { ulid } from 'ulid';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
 import { ClsModule } from 'nestjs-cls';
+import { UsersModule } from './users/users.module';
 
 mongoose.set('debug', (collectionName, methodName, ...methodArgs) => {
   Logger.verbose(
@@ -45,6 +46,7 @@ mongoose.set('debug', (collectionName, methodName, ...methodArgs) => {
         },
       },
     }),
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
