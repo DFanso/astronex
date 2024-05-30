@@ -14,7 +14,7 @@ import { UpdateInstituteDto } from './dto/update-institute.dto';
 import { Institute } from './entities/institute.entity';
 
 @ApiTags('institutes')
-@Controller('institutes')
+@Controller({ path: 'institutes', version: '1' })
 export class InstitutesController {
   constructor(private readonly institutesService: InstitutesService) {}
 

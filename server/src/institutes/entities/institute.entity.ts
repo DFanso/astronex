@@ -12,7 +12,7 @@ class Location {
   city: string;
 }
 
-@Schema()
+@Schema({ timestamps: true })
 export class Institute {
   @Prop({ required: true })
   name: string;
