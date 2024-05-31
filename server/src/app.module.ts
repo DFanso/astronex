@@ -32,6 +32,9 @@ mongoose.set('debug', (collectionName, methodName, ...methodArgs) => {
         COGNITO_USER_POOL_ID: Joi.string().required(),
         COGNITO_CLIENT_ID: Joi.string().required(),
         COGNITO_CLIENT_SECRET: Joi.string().required(),
+        COGNITO_CALLBACK_URL: Joi.string().required(),
+        COGNITO_DOMAIN: Joi.string().required(),
+        FRONTEND_URL: Joi.string().required(),
       }),
     }),
     MongooseModule.forRoot(
