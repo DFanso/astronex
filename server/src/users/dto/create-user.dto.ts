@@ -6,6 +6,7 @@ import {
   IsString,
   IsDateString,
   ValidateNested,
+  Matches,
 } from 'class-validator';
 import {
   UserStatus,
@@ -16,7 +17,7 @@ import {
 import { LocationDto } from './location.dto';
 
 export class CreateUserDto {
-  cognitoUserId: string;
+  cognitoUserId?: string;
 
   userAuthType: UserAuthType;
 
@@ -44,7 +45,13 @@ export class CreateUserDto {
 
   @ApiProperty({ description: 'Password of the user', example: 'password123' })
   @IsString()
-  @IsOptional()
+  @Matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/,
+    {
+      message:
+        'Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character',
+    },
+  )
   password?: string;
 
   @IsEnum(UserStatus)
@@ -94,7 +101,4 @@ export class CreateUserDto {
   @IsString()
   @IsOptional()
   institute?: string;
-
-  @IsOptional()
-  _id?: unknown;
 }

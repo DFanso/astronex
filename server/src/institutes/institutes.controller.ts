@@ -6,19 +6,28 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { InstitutesService } from './institutes.service';
 import { CreateInstituteDto } from './dto/create-institute.dto';
 import { UpdateInstituteDto } from './dto/update-institute.dto';
 import { Institute } from './entities/institute.entity';
+import { StatusUpdateDto } from './dto/status.update.dto';
+import { UsersService } from 'src/users/users.service';
+import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 
 @ApiTags('institutes')
 @Controller({ path: 'institutes', version: '1' })
 export class InstitutesController {
-  constructor(private readonly institutesService: InstitutesService) {}
+  constructor(
+    private readonly institutesService: InstitutesService,
+    private readonly usersService: UsersService,
+  ) {}
 
-  @Post()
+  @Post('signup')
   @ApiOperation({ summary: 'Create institute' })
   @ApiResponse({
     status: 201,
@@ -28,6 +37,29 @@ export class InstitutesController {
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   create(@Body() createInstituteDto: CreateInstituteDto) {
     return this.institutesService.create(createInstituteDto);
+  }
+
+  @Patch('status/:id')
+  @ApiOperation({ summary: 'Update status of the institute' })
+  @ApiResponse({
+    status: 201,
+    description: 'The status has been Updated successfully.',
+    type: Institute,
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
+  async statusUpdate(
+    @Param('id') id: string,
+    @Body() statusUpdateDto: StatusUpdateDto,
+  ) {
+    const institute = await this.institutesService.findOne({ _id: id });
+    if (!institute) {
+      throw new HttpException('Institute not found!', HttpStatus.NOT_FOUND);
+    }
+
+    return this.institutesService.statusUpdate(
+      institute.account,
+      statusUpdateDto,
+    );
   }
 
   @Get()

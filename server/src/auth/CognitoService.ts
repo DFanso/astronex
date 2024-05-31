@@ -91,6 +91,13 @@ export class CognitoService {
           HttpStatus.BAD_REQUEST,
         );
       }
+      if (err.name === 'InvalidPasswordException') {
+        throw new HttpException(
+          `Password did not conform with policy`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
       throw new HttpException(
         'Registration failed. Please try again later.',
         HttpStatus.INTERNAL_SERVER_ERROR,
