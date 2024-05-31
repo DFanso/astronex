@@ -25,16 +25,15 @@ export interface JwtPayload {
 }
 
 export enum UserStatus {
-  Verified = 'VERIFIED',
-  Unverified = 'UNVERIFIED',
-  google_Auth = 'GOOGLE_AUTH',
-}
-
-export enum UserStatus {
   UNVERIFIED = 'UNVERIFIED',
   VERIFIED = 'VERIFIED',
   INITIATE = 'INITIATE',
   GOOGLE_AUTH = 'GOOGLE_AUTH',
+}
+
+export enum UserAuthType {
+  COGNITO = 'COGNITO',
+  GOOGLE = 'GOOGLE',
 }
 
 export enum UserType {

@@ -7,10 +7,19 @@ import {
   IsDateString,
   ValidateNested,
 } from 'class-validator';
-import { UserStatus, UserType, FoundFrom } from 'src/Types/user.types';
+import {
+  UserStatus,
+  UserType,
+  FoundFrom,
+  UserAuthType,
+} from 'src/Types/user.types';
 import { LocationDto } from './location.dto';
 
 export class CreateUserDto {
+  cognitoUserId: string;
+
+  userAuthType: UserAuthType;
+
   @ApiProperty({ description: 'First name of the user', example: 'John' })
   @IsString()
   firstName: string;
@@ -33,25 +42,20 @@ export class CreateUserDto {
   @IsString()
   email: string;
 
-  @ApiPropertyOptional({
-    enum: UserStatus,
-    description: 'Status of the user',
-    example: UserStatus.VERIFIED,
-  })
+  @ApiProperty({ description: 'Password of the user', example: 'password123' })
+  @IsString()
+  password: string;
+
   @IsEnum(UserStatus)
   @IsOptional()
   status?: UserStatus;
 
-  @ApiPropertyOptional({
-    enum: UserType,
-    description: 'Type of the user',
-    example: UserType.MEMBER,
-  })
   @IsEnum(UserType)
   @IsOptional()
   type?: UserType;
 
   @ApiProperty({ type: LocationDto })
+  @IsOptional()
   @ValidateNested()
   @Type(() => LocationDto)
   location: LocationDto;
@@ -89,4 +93,6 @@ export class CreateUserDto {
   @IsString()
   @IsOptional()
   institute?: string;
+
+  _id: unknown;
 }

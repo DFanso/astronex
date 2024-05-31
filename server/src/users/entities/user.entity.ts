@@ -1,15 +1,20 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IsOptional, IsUrl } from 'class-validator';
 import mongoose, { Document, Types } from 'mongoose';
-import { UserStatus, UserType, FoundFrom } from 'src/Types/user.types';
+import {
+  UserStatus,
+  UserType,
+  FoundFrom,
+  UserAuthType,
+} from 'src/Types/user.types';
 
 export type UserDocument = User & Document;
 
 class Location {
-  @Prop({ required: true })
+  @Prop({ required: false })
   country: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   city: string;
 }
 
@@ -34,8 +39,7 @@ export class User {
   @Prop({ type: String, enum: UserType, default: UserType.MEMBER })
   type: UserType;
 
-  @Prop({ type: Location, required: true })
-  @IsOptional()
+  @Prop({ type: Location, required: false })
   location: Location;
 
   @Prop()
@@ -53,6 +57,14 @@ export class User {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Institute' })
   @IsOptional()
   institute: Types.ObjectId;
+
+  @Prop({ required: false, unique: true })
+  @IsOptional()
+  cognitoUserId: string;
+
+  @Prop({ required: false })
+  @IsOptional()
+  userAuthType: UserAuthType;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
