@@ -287,4 +287,59 @@ export class CognitoService {
       );
     }
   }
+
+  getGoogleSignInUrl(): string {
+    const domain = this.configService.get<string>('COGNITO_DOMAIN');
+    const clientId = this.configService.get<string>('COGNITO_CLIENT_ID');
+    const callbackUrl = this.configService.get<string>('COGNITO_CALLBACK_URL');
+
+    const url = `https://${domain}.auth.${this.configService.get<string>('AWS_REGION')}.amazoncognito.com/oauth2/authorize?client_id=${clientId}&response_type=code&scope=email+openid+profile&redirect_uri=${callbackUrl}`;
+    return url;
+  }
+
+  async exchangeCodeForToken(code: string): Promise<any> {
+    const clientId = this.configService.get<string>('COGNITO_CLIENT_ID');
+    const clientSecret = this.configService.get<string>(
+      'COGNITO_CLIENT_SECRET',
+    );
+    const callbackUrl = this.configService.get<string>('COGNITO_CALLBACK_URL');
+    const domain = this.configService.get<string>('COGNITO_DOMAIN');
+    const region = this.configService.get<string>('AWS_REGION');
+
+    const tokenUrl = `https://${domain}.auth.${region}.amazoncognito.com/oauth2/token`;
+
+    const params = new URLSearchParams();
+    params.append('grant_type', 'authorization_code');
+    params.append('client_id', clientId);
+    params.append('code', code);
+    params.append('redirect_uri', callbackUrl);
+    params.append('scope', 'openid email profile');
+
+    const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString(
+      'base64',
+    );
+
+    try {
+      const response = await fetch(tokenUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `Basic ${credentials}`,
+        },
+        body: params,
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to exchange code for tokens: ${response.statusText}`,
+        );
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error exchanging code for tokens:', error);
+      throw error;
+    }
+  }
 }

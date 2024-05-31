@@ -44,7 +44,8 @@ export class CreateUserDto {
 
   @ApiProperty({ description: 'Password of the user', example: 'password123' })
   @IsString()
-  password: string;
+  @IsOptional()
+  password?: string;
 
   @IsEnum(UserStatus)
   @IsOptional()
@@ -58,7 +59,7 @@ export class CreateUserDto {
   @IsOptional()
   @ValidateNested()
   @Type(() => LocationDto)
-  location: LocationDto;
+  location?: LocationDto;
 
   @ApiPropertyOptional({
     description: 'Birthday of the user',
@@ -94,5 +95,6 @@ export class CreateUserDto {
   @IsOptional()
   institute?: string;
 
-  _id: unknown;
+  @IsOptional()
+  _id?: unknown;
 }

@@ -6,6 +6,8 @@ import {
   UseGuards,
   HttpException,
   HttpStatus,
+  Res,
+  Query,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CognitoService } from './CognitoService';
@@ -24,10 +26,11 @@ import { UserLoginDto } from './dto/user-login.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ConfirmForgotPasswordDto } from './dto/confirm-forgot-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { UserAuthType, UserStatus } from 'src/Types/user.types';
+import { UserAuthType, UserStatus, UserType } from 'src/Types/user.types';
 import { ReRequestCodeDto } from './dto/re-request-code.dto';
 import { ConfigService } from '@nestjs/config';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { Response } from 'express';
 
 @ApiTags('auth')
 @Controller({ path: 'auth', version: '1' })
@@ -191,6 +194,54 @@ export class AuthController {
       };
     } catch (error) {
       throw new HttpException(`${error.message}`, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get('sso-sing-in')
+  googleSignIn(@Res() res: Response) {
+    const url = this.cognitoService.getGoogleSignInUrl();
+    res.redirect(url);
+  }
+
+  @Get('sso-callback')
+  async handleCallback(@Query('code') code: string, @Res() res: Response) {
+    try {
+      const tokens = await this.cognitoService.exchangeCodeForToken(code);
+      const idToken = tokens.id_token;
+      const refreshToken = tokens.refresh_token;
+
+      // Decode the ID token
+      const decodedToken = this.authService.decodeJwtToken(idToken);
+
+      // Extract user information from the decoded token
+      const email = decodedToken.email;
+      const firstName = decodedToken.given_name;
+      const lastName = decodedToken.family_name || '‎';
+      const picture = decodedToken.picture;
+      const userId = decodedToken.sub;
+
+      // Check if the user already exists in your database
+      let user = await this.usersService.findOne({ email });
+
+      if (!user) {
+        // If the user doesn't exist, create a new user record
+        const createUserDto: CreateUserDto = {
+          email,
+          firstName,
+          lastName: lastName || '‎',
+          avatar: picture,
+          type: UserType.MEMBER,
+          status: UserStatus.GOOGLE_AUTH,
+          cognitoUserId: userId,
+          userAuthType: UserAuthType.GOOGLE,
+        };
+        user = await this.usersService.create(createUserDto);
+      }
+      // Redirect the user to the frontend with the token
+      const frontendUrl = `${this.configService.get<string>('FRONTEND_URL')}/ProfileHandler?token=${idToken}?refreshToken=${refreshToken}`;
+      res.redirect(frontendUrl);
+    } catch (error) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send('An error occurred');
     }
   }
 }
