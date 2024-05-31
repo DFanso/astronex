@@ -10,6 +10,7 @@ import { ClsModule } from 'nestjs-cls';
 import { UsersModule } from './users/users.module';
 import { InstitutesModule } from './institutes/institutes.module';
 import { AuthModule } from './auth/auth.module';
+import { S3Module } from './s3/s3.module';
 
 mongoose.set('debug', (collectionName, methodName, ...methodArgs) => {
   Logger.verbose(
@@ -61,6 +62,7 @@ mongoose.set('debug', (collectionName, methodName, ...methodArgs) => {
     UsersModule,
     InstitutesModule,
     AuthModule,
+    S3Module,
   ],
   controllers: [AppController],
   providers: [AppService],
