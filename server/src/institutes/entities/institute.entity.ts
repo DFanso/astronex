@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import mongoose, { Document, Types } from 'mongoose';
 import * as crypto from 'crypto';
+import { IsOptional, IsUrl } from 'class-validator';
 
 export type InstituteDocument = Institute & Document;
 
@@ -21,6 +22,10 @@ export class Institute {
   email: string;
 
   @Prop({ required: true })
+  @IsUrl()
+  avatar: string;
+
+  @Prop({ required: true })
   description: string;
 
   @Prop({ type: Location, required: true })
@@ -31,6 +36,12 @@ export class Institute {
     default: () => crypto.randomBytes(16).toString('hex'),
   })
   secret: string;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  @IsOptional()
+  account: Types.ObjectId;
+  @IsOptional()
+  _id?: unknown;
 }
 
 export const InstituteSchema = SchemaFactory.createForClass(Institute);

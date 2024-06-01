@@ -29,6 +29,8 @@ export enum UserStatus {
   VERIFIED = 'VERIFIED',
   INITIATE = 'INITIATE',
   GOOGLE_AUTH = 'GOOGLE_AUTH',
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
 }
 
 export enum UserAuthType {

@@ -69,14 +69,23 @@ export class AuthController {
   @Post('login')
   async login(@Body() userLoginDto: UserLoginDto) {
     try {
+      const user = await this.usersService.findOne({
+        email: userLoginDto.email,
+      });
+      if (!user) {
+        throw new HttpException(`User not found!`, HttpStatus.NOT_FOUND);
+      } else if (user.status == UserStatus.UNVERIFIED) {
+        throw new HttpException(
+          'User Email not Confirmed',
+          HttpStatus.UNAUTHORIZED,
+        );
+      } else if (user.status == UserStatus.INACTIVE) {
+        throw new HttpException('Institute_Inactive', HttpStatus.UNAUTHORIZED);
+      }
       const tokens = await this.cognitoService.authenticateUser(
         userLoginDto.email,
         userLoginDto.password,
       );
-      let user;
-      if (tokens) {
-        user = await this.usersService.findOne({ email: userLoginDto.email });
-      }
       return { message: 'User login successfully', profile: user, tokens };
     } catch (err) {
       throw new HttpException(`${err.message}`, HttpStatus.UNAUTHORIZED);
@@ -231,7 +240,7 @@ export class AuthController {
           lastName: lastName || '‎',
           avatar: picture,
           type: UserType.MEMBER,
-          status: UserStatus.GOOGLE_AUTH,
+          status: UserStatus.INITIATE,
           cognitoUserId: userId,
           userAuthType: UserAuthType.GOOGLE,
         };

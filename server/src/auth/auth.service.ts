@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ClsService } from 'nestjs-cls';
-import { AppClsStore, UserStatus } from 'src/Types/user.types';
+import { AppClsStore, UserStatus, UserType } from 'src/Types/user.types';
 import { UsersService } from 'src/users/users.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { ConfigService } from '@nestjs/config';
@@ -31,7 +31,11 @@ export class AuthService {
     if (!user) {
       throw new HttpException('Email is not registered', HttpStatus.NOT_FOUND);
     }
-    user.status = UserStatus.INITIATE;
+    if (user.type == UserType.INSTITUTE) {
+      user.status = UserStatus.INACTIVE;
+    } else {
+      user.status = UserStatus.INITIATE;
+    }
 
     user.save();
   }
