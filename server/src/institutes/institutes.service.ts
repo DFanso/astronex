@@ -110,6 +110,12 @@ export class InstitutesService {
     if (!user) {
       throw new HttpException('User not found!', HttpStatus.NOT_FOUND);
     }
+    if (user.status == (statusUpdateDto.Status as string)) {
+      throw new HttpException(
+        `Institute already ${statusUpdateDto.Status}!`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     user.status = statusUpdateDto.Status as unknown as UserStatus;
 
     return user.save();

@@ -6,24 +6,33 @@ import {
   Patch,
   Param,
   Delete,
-  Put,
   HttpException,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { InstitutesService } from './institutes.service';
 import { CreateInstituteDto } from './dto/create-institute.dto';
 import { UpdateInstituteDto } from './dto/update-institute.dto';
 import { Institute } from './entities/institute.entity';
 import { StatusUpdateDto } from './dto/status.update.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { ClsService } from 'nestjs-cls';
+import { AppClsStore, UserType } from 'src/Types/user.types';
 import { UsersService } from 'src/users/users.service';
-import { UpdateUserDto } from 'src/users/dto/update-user.dto';
+import mongoose from 'mongoose';
 
 @ApiTags('institutes')
 @Controller({ path: 'institutes', version: '1' })
 export class InstitutesController {
   constructor(
     private readonly institutesService: InstitutesService,
+    private readonly clsService: ClsService,
     private readonly usersService: UsersService,
   ) {}
 
@@ -40,6 +49,8 @@ export class InstitutesController {
   }
 
   @Patch('status/:id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Update status of the institute' })
   @ApiResponse({
     status: 201,
@@ -51,6 +62,17 @@ export class InstitutesController {
     @Param('id') id: string,
     @Body() statusUpdateDto: StatusUpdateDto,
   ) {
+    const context = this.clsService.get<AppClsStore>();
+    if (!context || !context.user) {
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+    }
+    const user = await this.usersService.findOne({ _id: context.user.id });
+    if (!user || user.type != UserType.ADMIN) {
+      throw new HttpException('Unauthorized User', HttpStatus.UNAUTHORIZED);
+    }
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new HttpException('Invalid Institute Id!', HttpStatus.BAD_REQUEST);
+    }
     const institute = await this.institutesService.findOne({ _id: id });
     if (!institute) {
       throw new HttpException('Institute not found!', HttpStatus.NOT_FOUND);
