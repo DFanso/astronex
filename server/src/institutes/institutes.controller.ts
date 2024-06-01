@@ -107,19 +107,34 @@ export class InstitutesController {
     return this.institutesService.findOne(id);
   }
 
-  @Patch(':id')
-  @ApiOperation({ summary: 'Update institute by ID' })
+  @Patch()
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Update institute' })
   @ApiResponse({
     status: 200,
     description: 'The institute has been successfully updated.',
     type: Institute,
   })
   @ApiResponse({ status: 404, description: 'Institute not found.' })
-  update(
-    @Param('id') id: string,
-    @Body() updateInstituteDto: UpdateInstituteDto,
-  ) {
-    return this.institutesService.update(id, updateInstituteDto);
+  async update(@Body() updateInstituteDto: UpdateInstituteDto) {
+    const context = this.clsService.get<AppClsStore>();
+    if (!context || !context.user) {
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+    }
+    const user = await this.usersService.findOne({ _id: context.user.id });
+    if (!user || user.type != UserType.INSTITUTE) {
+      throw new HttpException('Unauthorized User', HttpStatus.UNAUTHORIZED);
+    }
+
+    const institute = await this.institutesService.findOne({
+      account: user._id,
+    });
+    if (!institute) {
+      throw new HttpException('Institute not found!', HttpStatus.NOT_FOUND);
+    }
+
+    return this.institutesService.update(institute._id, updateInstituteDto);
   }
 
   @Delete(':id')

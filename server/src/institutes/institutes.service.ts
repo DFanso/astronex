@@ -82,7 +82,7 @@ export class InstitutesService {
   }
 
   async update(
-    id: string,
+    id: any,
     updateInstituteDto: UpdateInstituteDto,
   ): Promise<Institute> {
     const updatedInstitute = await this.instituteModel
