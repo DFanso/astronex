@@ -7,6 +7,7 @@ import { InstitutesService } from './institutes.service';
 import { InstitutesController } from './institutes.controller';
 import { Institute, InstituteSchema } from './entities/institute.entity';
 import { JoinRequest, JoinRequestSchema } from './entities/join-request-entity';
+import { EmailModule } from 'src/email/email.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { JoinRequest, JoinRequestSchema } from './entities/join-request-entity';
     AuthModule,
     UsersModule,
     ClsModule,
+    EmailModule,
   ],
   controllers: [InstitutesController],
   providers: [InstitutesService],

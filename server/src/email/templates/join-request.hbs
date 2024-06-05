@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Request</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #111;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #fff;
+            border-radius: 10px;
+            background-color: #000;
+            position: relative;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+        .logo {
+            max-width: 50px;
+        }
+        .logo-name {
+            margin-left: 10px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .avatar {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 50%;
+            overflow: hidden;
+            padding: 2px;
+            background-color: #444;
+        }
+        .details {
+            margin-bottom: 20px;
+        }
+        .status {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: #bbb;
+        }
+        .footer a {
+            color: #bbb;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <img src="https://astronex.s3.ap-southeast-1.amazonaws.com/system/494ed628-4978-4a87-9dff-0f01e4109b53-astronex_logo.jpeg" alt="Astronex Logo" class="logo">
+                <span class="logo-name">Astronex</span>
+            </div>
+            <img src="{{avatar}}" alt="User Avatar" class="avatar">
+        </div>
+        <h2>Hey {{memberName}},</h2>
+        <h3>We have received your join request!</h3>
+        <div class="details">
+            <p>Your Request to join <strong>{{instituteName}}</strong> institute is on <span class="status">{{status}}</span> status right now.</p>
+        </div>
+        <p>The institute will check your details and process your join request. We appreciate your patience.</p>
+        <div class="footer">
+            <p>© 2024 Astronex Community</p>
+            <p><a href="mailto:noreply@astronex.com">noreply@astronex.com</a> | <a href="http://www.astronex.org">www.astronex.org</a></p>
+        </div>
+    </div>
+</body>
+</html>

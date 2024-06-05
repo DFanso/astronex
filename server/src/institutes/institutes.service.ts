@@ -22,6 +22,7 @@ import {
   JoinRequestDocument,
 } from './entities/join-request-entity';
 import { CreateJoinRequestDto } from './dto/join-request-institute.dto';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class InstitutesService {
@@ -32,6 +33,7 @@ export class InstitutesService {
     private joinRequestModel: Model<JoinRequestDocument>,
     private readonly cognitoService: CognitoService,
     private readonly usersService: UsersService,
+    private readonly emailService: EmailService,
   ) {}
 
   async create(
@@ -76,8 +78,31 @@ export class InstitutesService {
     }
   }
 
-  async join(createJoinRequestDto: CreateJoinRequestDto): Promise<JoinRequest> {
-    return this.joinRequestModel.create(createJoinRequestDto);
+  async join(
+    createJoinRequestDto: CreateJoinRequestDto,
+    user: User,
+    institute: Institute,
+  ): Promise<JoinRequest> {
+    const joinRequest =
+      await this.joinRequestModel.create(createJoinRequestDto);
+
+    const emailHtml = await this.emailService.renderTemplate(
+      'join-request.hbs',
+      {
+        memberName: `${user.firstName} ${user.lastName}`,
+        instituteName: institute.name,
+        status: createJoinRequestDto.status,
+        avatar: user.avatar,
+      },
+    );
+
+    await this.emailService.sendEmail(
+      [user.email],
+      `Your Join Request to ${institute.name} Institute`,
+      emailHtml,
+    );
+
+    return joinRequest;
   }
 
   async findAll(): Promise<Institute[]> {
@@ -91,6 +116,10 @@ export class InstitutesService {
         path: 'account',
       })
       .exec();
+  }
+
+  async joinRequestFindOne(filter: any): Promise<JoinRequestDocument | null> {
+    return this.joinRequestModel.findOne(filter).exec();
   }
 
   async update(

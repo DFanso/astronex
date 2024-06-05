@@ -82,11 +82,21 @@ export class InstitutesController {
     if (!institute) {
       throw new HttpException('Institute not found!', HttpStatus.NOT_FOUND);
     }
+    const request = await this.institutesService.joinRequestFindOne({
+      member: context.user.id,
+      institute: createJoinRequestDto.institute,
+    });
+    if (request) {
+      throw new HttpException(
+        'User already in this institute',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
 
     createJoinRequestDto.member = new mongoose.Types.ObjectId(context.user.id);
     createJoinRequestDto.status = JoinRequestStatus.PENDING;
 
-    return this.institutesService.join(createJoinRequestDto);
+    return this.institutesService.join(createJoinRequestDto, user, institute);
   }
 
   @Patch('status/:id')
