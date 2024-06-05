@@ -17,12 +17,19 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { StatusUpdateDto } from './dto/status.update.dto';
+import {
+  JoinRequest,
+  JoinRequestDocument,
+} from './entities/join-request-entity';
+import { CreateJoinRequestDto } from './dto/join-request-institute.dto';
 
 @Injectable()
 export class InstitutesService {
   constructor(
     @InjectModel(Institute.name)
     private instituteModel: Model<InstituteDocument>,
+    @InjectModel(JoinRequest.name)
+    private joinRequestModel: Model<JoinRequestDocument>,
     private readonly cognitoService: CognitoService,
     private readonly usersService: UsersService,
   ) {}
@@ -68,6 +75,11 @@ export class InstitutesService {
       }
     }
   }
+
+  async join(createJoinRequestDto: CreateJoinRequestDto): Promise<JoinRequest> {
+    return this.joinRequestModel.create(createJoinRequestDto);
+  }
+
   async findAll(): Promise<Institute[]> {
     return this.instituteModel.find().exec();
   }

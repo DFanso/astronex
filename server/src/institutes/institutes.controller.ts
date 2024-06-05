@@ -26,6 +26,9 @@ import { ClsService } from 'nestjs-cls';
 import { AppClsStore, UserType } from 'src/Types/user.types';
 import { UsersService } from 'src/users/users.service';
 import mongoose from 'mongoose';
+import { JoinRequest } from './entities/join-request-entity';
+import { CreateJoinRequestDto } from './dto/join-request-institute.dto';
+import { JoinRequestStatus } from 'src/Types/institute.types';
 
 @ApiTags('institutes')
 @Controller({ path: 'institutes', version: '1' })
@@ -46,6 +49,44 @@ export class InstitutesController {
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   create(@Body() createInstituteDto: CreateInstituteDto) {
     return this.institutesService.create(createInstituteDto);
+  }
+
+  @Post('join')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'join request institute' })
+  @ApiResponse({
+    status: 201,
+    description: 'The institute has been successfully created.',
+    type: JoinRequest,
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
+  async join(@Body() createJoinRequestDto: CreateJoinRequestDto) {
+    const context = this.clsService.get<AppClsStore>();
+    if (!context || !context.user) {
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+    }
+    const user = await this.usersService.findOne({ _id: context.user.id });
+    if (!user || user.type != UserType.MEMBER) {
+      throw new HttpException('Unauthorized User', HttpStatus.UNAUTHORIZED);
+    }
+    if (user.institute != null || user.institute != undefined) {
+      throw new HttpException(
+        'User already joined to institute',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const institute = await this.institutesService.findOne({
+      _id: createJoinRequestDto.institute,
+    });
+    if (!institute) {
+      throw new HttpException('Institute not found!', HttpStatus.NOT_FOUND);
+    }
+
+    createJoinRequestDto.member = new mongoose.Types.ObjectId(context.user.id);
+    createJoinRequestDto.status = JoinRequestStatus.PENDING;
+
+    return this.institutesService.join(createJoinRequestDto);
   }
 
   @Patch('status/:id')
